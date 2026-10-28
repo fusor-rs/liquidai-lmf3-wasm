@@ -1,0 +1,32 @@
+{
+  "colors": {
+    "turns": [
+      {
+        "text": "Name the three primary colors of light, in one sentence.",
+        "max_tokens": 48,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0,
+        "expect": ["red", "green", "blue"]
+      },
+      {
+        "text": "Which color do you get when you mix the first two?",
+        "thinking": true,
+        "max_tokens": 96,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0
+      }
+    ]
+  },
+  "trip": {
+    "turns": [
+      {
+        "text": "A train leaves at 9:40 and arrives at 13:15. How long is the trip? Answer in one sentence.",
+        "thinking": true,
+        "max_tokens": 1024,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0,
+        "expect": ["3 hours", "35 minutes"]
+      }
+    ]
+  }
+}

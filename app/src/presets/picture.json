@@ -1,0 +1,10 @@
+{
+  "people": {
+    "type": "number",
+    "instructions": "How many people are there?",
+    "range": [0, 10],
+    "step": 1
+  },
+  "subject": { "type": "box", "instructions": "Where is the main subject of the picture?" },
+  "every_person": { "type": "boxes", "instructions": "Every person.", "max": 8 }
+}

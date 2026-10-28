@@ -1,0 +1,21 @@
+{
+  "receipt": {
+    "turns": [
+      {
+        "text": "What is the total on this receipt? Answer in one sentence.",
+        "images": ["example-receipt.png"],
+        "max_tokens": 64,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0,
+        "expect": ["125.01"]
+      },
+      {
+        "text": "Which item on it cost the most?",
+        "max_tokens": 64,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0,
+        "expect": ["blender"]
+      }
+    ]
+  }
+}

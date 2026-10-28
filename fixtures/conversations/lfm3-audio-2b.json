@@ -1,0 +1,51 @@
+{
+  "chat": {
+    "turns": [
+      {
+        "text": "Name the three primary colors of light, in one sentence.",
+        "max_tokens": 48,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0,
+        "expect": ["red", "green", "blue"]
+      }
+    ]
+  },
+  "transcribe": {
+    "turns": [
+      {
+        "text": "",
+        "system": "Perform ASR in English.",
+        "mode": "transcribe",
+        "audio": ["en-Alice_woman.wav"],
+        "max_tokens": 128,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0
+      }
+    ]
+  },
+  "speech": {
+    "turns": [
+      {
+        "text": "The quick brown fox jumps over the lazy dog.",
+        "system": "Perform TTS in American English using a female voice.",
+        "mode": "speech",
+        "max_tokens": 256,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0
+      }
+    ]
+  },
+  "interleaved": {
+    "turns": [
+      {
+        "text": "What is the capital of France? Answer in one sentence.",
+        "system": "Respond with interleaved text and audio.",
+        "mode": "interleaved",
+        "max_tokens": 256,
+        "sampling": { "temperature": 0, "top_p": 1, "top_k": 1, "presence_penalty": 0 },
+        "seed": 0,
+        "expect": ["Paris"]
+      }
+    ]
+  }
+}

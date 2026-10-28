@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LFM3 · a conversation that thinks, in your browser</title>
+  <meta name="description" content="Liquid AI's LFM3 models running on this device's CPU, compiled to WebAssembly with fusor-ai: pick LFM3-1.7B, LFM3-VL-2B, LFM3-Audio-2B or LFM3-Omni-2B, talk to it in text or speech, show it images, let it think first, and watch or hear the reply stream in, or pick d1-2B or d1-Omni-2B and have it answer typed questions about a state, its images and its clips. Nothing leaves the page.">
+  <link rel="icon" href="/brand/lfm3.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/base.css">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <App state="{{ App::new() }}">
+    <script type="module" src="./app.js"></script>
+    <main on:engine="state.receive(event)" data-phase="{{ state.phase.get().name() }}" data-loaded="{{ state.loaded.get().is_some() }}">
+      <header class="masthead">
+        <div class="lockup">
+          <img src="/brand/fusor-ai.svg" alt="fusor-ai" width="40" height="40">
+          <span class="times" aria-hidden="true">×</span>
+          <img src="/brand/lfm3.svg" alt="" width="36" height="36">
+          <span class="wordmark">LFM3</span>
+        </div>
+        <h1>A conversation that thinks, on your own CPU</h1>
+        <p class="lede">Liquid AI's LFM3 models, compiled to WebAssembly with fusor-ai: LFM3-1.7B, a text chat model; LFM3-VL-2B, which reads images too; LFM3-Audio-2B, which hears speech and speaks; and LFM3-Omni-2B, which does all of it; and d1-2B and d1-Omni-2B, decision models that answer named, typed questions about a state and its images (and, for d1-Omni-2B, its clips) in one pass. Ask anything, show it an image, play or record it a clip, let it reason in a thinking block first or answer straight away, and read or hear the reply as it is written. Once loaded, nothing you type, show or say leaves the page.</p>
+        <nav class="models" aria-label="Model">
+          <ForEach items="{{ state.models.get() }}" key="{{ |model| model.id.clone() }}">
+            <a class="chip" href="{{ item.get().link() }}" data-model="{{ item.get().id }}" data-current="{{ item.get().current }}">{{ item.get().label() }}</a>
+          </ForEach>
+        </nav>
+      </header>
+
+      <If condition="{{ state.loading() }}">
+        <section class="card loading" aria-live="polite">
+          <div class="row"><strong>Loading the model</strong><span id="detail" class="muted">{{ state.detail.get() }}</span></div>
+          <progress max="1" value="{{ state.fraction.get() }}"></progress>
+        </section>
+      </If>
+
+      <If condition="{{ state.phase.get() == Phase::Broken }}">
+        <section class="card broken" role="alert">
+          <strong>{{ if state.failed_to_load() { "The model could not load" } else { "The engine stopped" } }}</strong>
+          <p id="detail">{{ state.detail.get() }}</p>
+          <If condition="{{ state.failed_to_load() }}">
+            <p class="muted">A bundle loads only into the runtime built with it. If you built this page yourself, rebuild both with <code>just ui</code>.</p>
+          </If>
+          <div class="row"><a id="reload" class="control primary" href="">Reload</a></div>
+        </section>
+      </If>
+
+      <If condition="{{ !state.decides() }}">
+        <section class="card chat" data-phase="{{ state.phase.get().name() }}">
+          <div id="conversation" class="conversation" aria-live="polite">
+            <ForEach items="{{ state.entries.get() }}" key="{{ |entry| entry.index }}">
+              <article class="message" data-role="{{ item.get().role.name() }}" data-text="{{ item.get().text }}">
+                <If condition="{{ item.get().reasons() }}">
+                  <details class="reasoning" open="{{ item.get().text.is_empty() }}">
+                    <summary>Reasoning</summary>
+                    <p class="thought">{{ item.get().reasoning() }}</p>
+                  </details>
+                </If>
+                <If condition="{{ item.get().is_user() }}">
+                  <p class="said">{{ item.get().text }}</p>
+                  <p class="muted images">{{ item.get().images() }}</p>
+                </If>
+                <If condition="{{ !item.get().is_user() }}">
+                  <div class="said">
+                    <ForEach items="{{ item.get().blocks() }}" key="{{ |block| block.index }}">
+                      <div class="block" data-kind="{{ item.get().kind.name() }}"><ForEach items="{{ item.get().spans }}" key="{{ |span| span.index }}"><span data-style="{{ item.get().style.name() }}">{{ item.get().text }}</span></ForEach></div>
+                    </ForEach>
+                  </div>
+                </If>
+              </article>
+            </ForEach>
+          </div>
+          <If condition="{{ state.empty() }}">
+            <p class="muted placeholder">The conversation appears here, each reply as it is written.</p>
+          </If>
+          <dl class="metrics">
+            <div><dt>First token</dt><dd id="first">{{ state.metrics.get().first_token() }}</dd><dd class="muted">from Send to the reply's start</dd></div>
+            <div><dt>Speed</dt><dd id="speed">{{ state.metrics.get().speed() }}</dd><dd class="muted">tokens written per second</dd></div>
+            <div><dt>Tokens</dt><dd id="tokens">{{ state.metrics.get().tokens() }}</dd><dd class="muted">in the reply</dd></div>
+            <div><dt>Context</dt><dd id="context">{{ state.metrics.get().context() }}</dd><dd class="muted">{{ state.metrics.get().read() }}</dd></div>
+            <div><dt>Network</dt><dd id="requests">{{ state.metrics.get().requests() }}</dd><dd class="muted">requests since the model loaded</dd></div>
+          </dl>
+        </section>
+      </If>
+      <If condition="{{ state.decides() }}">
+        <section class="card decision" data-phase="{{ state.phase.get().name() }}">
+          <If condition="{{ !state.regions().is_empty() }}">
+            <figure class="picture">
+              <canvas data-image="{{ state.picture_index() }}" data-height="480"></canvas>
+              <div class="regions">
+                <ForEach items="{{ state.regions() }}" key="{{ |region| region.index }}">
+                  <div class="region" style="{{ item.get().style() }}"><span>{{ item.get().label }}</span></div>
+                </ForEach>
+              </div>
+            </figure>
+          </If>
+          <div id="answers" class="answers" aria-live="polite">
+            <ForEach items="{{ state.answers.get() }}" key="{{ |answer| answer.name.clone() }}">
+              <article class="answer" data-name="{{ item.get().name }}" data-type="{{ item.get().kind() }}">
+                <div class="row"><strong>{{ item.get().name }}</strong><span class="muted">{{ item.get().kind() }}</span></div>
+                <p class="headline">{{ item.get().headline() }}</p>
+                <div class="bars">
+                  <ForEach items="{{ item.get().bars() }}" key="{{ |bar| bar.index }}">
+                    <div class="bar"><span>{{ item.get().label }}</span><progress max="1" value="{{ item.get().share }}"></progress><span class="muted">{{ item.get().percent() }}</span></div>
+                  </ForEach>
+                </div>
+                <p class="muted">{{ item.get().detail() }}</p>
+              </article>
+            </ForEach>
+          </div>
+          <If condition="{{ state.answers.get().is_empty() }}">
+            <p class="muted placeholder">The answers appear here, one card per question, every box drawn over the picture.</p>
+          </If>
+          <dl class="metrics">
+            <div><dt>Load</dt><dd id="load">{{ state.load_time() }}</dd><dd class="muted">{{ state.load_source() }}</dd></div>
+            <div><dt>Answers</dt><dd id="answer-time">{{ state.answering.get().answer_time() }}</dd><dd class="muted">from Send to every answer</dd></div>
+            <div><dt>Input tokens</dt><dd id="input-tokens">{{ state.answering.get().input_tokens() }}</dd><dd class="muted">read over every pack</dd></div>
+            <div><dt>Packs</dt><dd id="packs">{{ state.answering.get().packs() }}</dd><dd class="muted">passes over the state and up to 16 questions</dd></div>
+            <div><dt>Network</dt><dd id="answer-requests">{{ state.answering.get().requests() }}</dd><dd class="muted">requests since the model loaded</dd></div>
+          </dl>
+        </section>
+      </If>
+
+      <section class="card composer" data-phase="{{ state.phase.get().name() }}">
+        <If condition="{{ !state.decides() }}">
+          <fieldset class="examples" disabled="{{ !state.idle() }}">
+            <legend>Start from</legend>
+            <div class="choices">
+              <ForEach items="{{ state.examples() }}" key="{{ |example| example.id }}">
+                <button type="button" class="chip" data-example="{{ item.get().id }}" on:click="state.pick(&item.get())">{{ item.get().label }}</button>
+              </ForEach>
+            </div>
+          </fieldset>
+          <label for="message">Message</label>
+          <textarea id="message" class="field" rows="3" bind="state.text"></textarea>
+        </If>
+        <If condition="{{ state.decides() }}">
+          <fieldset class="examples" disabled="{{ !state.idle() }}">
+            <legend>Start from</legend>
+            <div class="choices">
+              <ForEach items="{{ state.presets() }}" key="{{ |preset| preset.id }}">
+                <button type="button" class="chip" data-preset="{{ item.get().id }}" on:click="state.pick_preset(&item.get())">{{ item.get().label }}</button>
+              </ForEach>
+            </div>
+          </fieldset>
+          <label for="state">State <span class="muted">(text, or JSON; empty when the media are the whole state)</span></label>
+          <textarea id="state" class="field" rows="4" bind="state.decision_state"></textarea>
+          <label for="questions">Questions <span class="muted">(a JSON object of named questions)</span></label>
+          <textarea id="questions" class="field mono" rows="10" bind="state.questions"></textarea>
+        </If>
+        <If condition="{{ state.reads_images() }}">
+          <div class="media">
+            <label id="pick" class="drop" data-disabled="{{ !state.idle() }}">
+              <span class="hint">Drop, paste or <u>choose</u> images for the next message (optional)</span>
+              <input id="file" type="file" accept="image/*" multiple disabled="{{ !state.idle() }}">
+            </label>
+            <div class="thumbs">
+              <ForEach items="{{ state.images.get() }}" key="{{ |image| image.index }}">
+                <figure class="thumb"><canvas data-image="{{ item.get().index }}"></canvas><figcaption class="muted">{{ item.get().summary() }}</figcaption></figure>
+              </ForEach>
+            </div>
+            <div class="row">
+              <span id="images" class="muted">{{ state.images_summary() }}</span>
+              <button id="clear" type="button" class="control" disabled="{{ !state.idle() || state.images.get().is_empty() }}" on:click="state.clear()">Remove images</button>
+            </div>
+          </div>
+        </If>
+        <If condition="{{ state.hears() }}">
+          <div class="media audio">
+            <If condition="{{ !state.decides() }}">
+              <div class="row">
+                <label>Reply as
+                  <select id="mode" class="field" bind="state.mode" disabled="{{ !state.idle() }}">
+                    <option value="text">Text</option>
+                    <option value="transcribe">A transcript (ASR)</option>
+                    <option value="speech">Speech (TTS)</option>
+                    <option value="interleaved">Text and speech</option>
+                  </select>
+                </label>
+                <If condition="{{ state.transcribes() }}">
+                  <label>Language <input id="asr-language" class="field" bind="state.asr_language"></label>
+                </If>
+                <If condition="{{ state.speaks() }}">
+                  <label>Language <input id="tts-language" class="field" bind="state.tts_language"></label>
+                  <label>Voice
+                    <select id="voice" class="field" bind="state.voice">
+                      <option value="female">Female</option>
+                      <option value="male">Male</option>
+                    </select>
+                  </label>
+                </If>
+              </div>
+            </If>
+            <label id="pick-audio" class="drop" data-disabled="{{ !state.idle() }}">
+              <span class="hint">Choose audio files for the next message, or record one (optional)</span>
+              <input id="audio-file" type="file" accept="audio/*" multiple disabled="{{ !state.idle() }}">
+            </label>
+            <ul class="clips">
+              <ForEach items="{{ state.clips.get() }}" key="{{ |clip| clip.index }}">
+                <li class="muted">{{ item.get().summary() }}</li>
+              </ForEach>
+            </ul>
+            <div class="row">
+              <span id="clips" class="muted">{{ state.clips_summary() }}</span>
+              <button id="record" type="button" class="control" data-recording="{{ state.recording.get() }}" disabled="{{ !state.idle() }}" on:click="state.record()">{{ state.record_label() }}</button>
+              <button id="clear-clips" type="button" class="control" disabled="{{ !state.idle() || state.clips.get().is_empty() }}" on:click="state.drop_clips()">Remove clips</button>
+            </div>
+          </div>
+        </If>
+        <If condition="{{ !state.decides() }}">
+          <div class="settings">
+            <label class="toggle"><input id="thinking" type="checkbox" bind="state.thinking"> Think before replying</label>
+            <details class="sampling">
+              <summary>Sampling</summary>
+              <label class="toggle"><input id="card-sampling" type="checkbox" bind="state.card_sampling"> The model card's settings for the turn</label>
+              <div class="fields" data-disabled="{{ state.card_sampling.get() }}">
+                <label>Temperature <input id="temperature" class="field" type="number" min="0" step="0.05" bind="state.temperature"></label>
+                <label>Top-p <input id="top-p" class="field" type="number" min="0.05" max="1" step="0.05" bind="state.top_p"></label>
+                <label>Top-k <input id="top-k" class="field" type="number" min="1" step="1" bind="state.top_k"></label>
+                <label>Presence penalty <input id="presence-penalty" class="field" type="number" min="0" step="0.1" bind="state.presence_penalty"></label>
+              </div>
+              <label>Longest reply, in tokens <input id="max-tokens" class="field" type="number" min="1" max="4096" step="1" bind="state.max_tokens"></label>
+            </details>
+          </div>
+        </If>
+        <div class="row">
+          <button id="send" type="button" class="control primary" disabled="{{ !state.idle() }}" on:click="state.send()"><span class="dot" aria-hidden="true"></span>{{ state.send_label() }}</button>
+          <button id="stop" type="button" class="control" disabled="{{ state.idle() }}" on:click="state.stop()">Stop</button>
+          <If condition="{{ !state.decides() }}">
+            <button id="reset" type="button" class="control" disabled="{{ !state.idle() || state.empty() }}" on:click="state.reset()">New conversation</button>
+          </If>
+        </div>
+        <span id="status" class="muted" aria-live="polite">{{ state.status.get() }}</span>
+      </section>
+
+      <footer class="muted">
+        <span id="runtime">{{ state.summary() }}</span>
+        <span>Built with <a href="https://github.com/fusor-rs/fusor-ai">fusor-ai</a> and <a href="https://fusor.build">fusor</a> · model: <a id="model-card" href="{{ state.model_card() }}">{{ state.model_name() }}</a> by <a href="https://huggingface.co/LiquidAI">Liquid AI</a> (<a href="{{ state.model_license() }}">LFM Open License v1.0</a>) · <a href="https://github.com/fusor-rs/liquidai-lmf3-wasm">source</a></span>
+      </footer>
+    </main>
+  </App>
+</body>
+</html>

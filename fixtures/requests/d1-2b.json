@@ -1,0 +1,90 @@
+{
+  "ticket": {
+    "state": "I was charged twice and my parcel never arrived. Please refund one charge.",
+    "questions": {
+      "refund": {
+        "type": "noul",
+        "instructions": "Is the customer asking for a refund?"
+      },
+      "team": {
+        "type": "choice",
+        "instructions": "Which team should handle this?",
+        "criteria": {
+          "billing": "Charges, refunds, invoices",
+          "shipping": "Delivery and parcels",
+          "technical": "App or site faults"
+        }
+      },
+      "topics": {
+        "type": "choice",
+        "multiple": true,
+        "instructions": "Which topics does the message raise?",
+        "criteria": {
+          "billing": "Payments and charges",
+          "delivery": "Shipping and parcels",
+          "login": "Signing in to the account"
+        }
+      },
+      "urgency": {
+        "type": "score",
+        "instructions": "How urgent is this ticket?",
+        "criteria": [
+          "low",
+          "medium",
+          "high"
+        ]
+      }
+    }
+  },
+  "invoice": {
+    "state": "ACME SA\nInvoice 2026-117\nTotal due: 1 234,50 EUR\nPay before 03/04/2026 (day/month/year)",
+    "questions": {
+      "payee": {
+        "type": "text",
+        "instructions": "Who issued the invoice?"
+      },
+      "total": {
+        "type": "number",
+        "instructions": "How much is due?",
+        "unit": "EUR"
+      },
+      "due": {
+        "type": "date",
+        "instructions": "By when must it be paid?"
+      },
+      "vat": {
+        "type": "number",
+        "instructions": "How much VAT is charged?"
+      }
+    }
+  },
+  "receipt": {
+    "questions": {
+      "receipt": {
+        "type": "noul",
+        "instructions": "Is this a receipt?"
+      },
+      "kind": {
+        "type": "choice",
+        "instructions": "Where was this bought?",
+        "criteria": {
+          "shop": "A shop or a supermarket",
+          "restaurant": "A restaurant or a cafe",
+          "fuel": "A fuel station"
+        }
+      },
+      "total": {
+        "type": "box",
+        "instructions": "Where is the total?"
+      },
+      "prices": {
+        "type": "boxes",
+        "instructions": "Every price.",
+        "max": 8
+      }
+    },
+    "images": [
+      "example-receipt.png"
+    ]
+  }
+}

@@ -1,0 +1,111 @@
+<!doctype html>
+<!--
+  The README's benchmark summary: liquidai-lmf3-wasm in Chrome, from one `just e2e` run.
+  Rendered at 1400×960, twice the pixels, by
+  `node scripts/render-images.mjs` into benchmarks.png and benchmarks-dark.png (`?theme=dark`).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --canvas: #faf9f6; --card: #ffffff; --ink: #272a2c; --soft: #5c5f61; --faint: #8b8d8d;
+    --hairline: #e3e0d9; --ours: #df5036; --theirs: #3f78b5;
+  }
+  :root.dark {
+    --canvas: #121314; --card: #1a1b1c; --ink: #f2f1ed; --soft: #b4b5b3; --faint: #8b8d8d;
+    --hairline: #303335; --ours: #e8603f; --theirs: #4a87d0;
+  }
+  html, body { margin: 0; }
+  body {
+    width: 1400px; height: 960px; box-sizing: border-box; padding: 56px 64px;
+    background: var(--canvas); color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; }
+  h1 { margin: 0; font-size: 36px; letter-spacing: -0.02em; }
+  header p { margin: 8px 0 0; font-size: 19px; color: var(--soft); }
+  .legend { display: flex; flex-direction: column; gap: 10px; font-size: 19px; }
+  .legend span { display: flex; align-items: center; gap: 10px; }
+  .legend i { width: 18px; height: 18px; border-radius: 4px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .panel { background: var(--card); border: 1px solid var(--hairline); border-radius: 16px; padding: 24px 28px; }
+  .panel h2 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+  .panel .unit { margin: 4px 0 0; font-size: 16px; color: var(--faint); }
+  .verdict { margin: 12px 0 18px; font-size: 19px; font-weight: 600; }
+  .verdict.loss { color: var(--soft); }
+  .group { display: grid; grid-template-columns: 150px 1fr; align-items: center; column-gap: 12px; margin-top: 12px; }
+  .group > b { font-size: 16px; font-weight: 500; color: var(--soft); }
+  .bars { display: flex; flex-direction: column; gap: 2px; }
+  .row { display: flex; align-items: center; gap: 10px; height: 22px; font-size: 16px; }
+  .bar { height: 22px; border-radius: 0 4px 4px 0; }
+  .row.none { color: var(--faint); font-style: italic; }
+  .stat { display: flex; align-items: baseline; gap: 16px; margin-top: 18px; }
+  .stat b { font-size: 72px; letter-spacing: -0.04em; line-height: 1; }
+  .stat span { font-size: 19px; color: var(--soft); line-height: 1.4; }
+  footer { margin-top: 22px; font-size: 15px; color: var(--faint); line-height: 1.5; }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>liquidai-lmf3-wasm, in Chrome</h1>
+      <p>Liquid AI's LFM3 and d1 models on one Apple M4 Pro, eight threads; each panel says which way is better.</p>
+    </div>
+    <div class="legend">
+      <span><i style="background: var(--ours)"></i>liquidai-lmf3-wasm</span>
+      <span><i style="background: var(--theirs)"></i>the checkpoint</span>
+    </div>
+  </header>
+  <div class="grid" id="grid"></div>
+  <footer>
+    Turns: LFM3-1.7B's thinking question (37 prompt tokens), LFM3-VL-2B's follow-up about the receipt (943 tokens with the
+    picture and the conversation so far), a 9.3 s clip transcribed by LFM3-Audio-2B and LFM3-Omni-2B. Requests: an invoice's four
+    reads, a receipt picture's four questions with its boxes, a voice clip's two choices. Chrome: the page on eight threads, relaxed
+    SIMD, one fresh-profile run of <code>just e2e</code>; replies greedy.
+  </footer>
+<script>
+  const PANELS = [
+    {
+      title: 'First token', unit: 'Seconds from Send to the reply\'s start: shorter is better',
+      verdict: 'A third of a second; under two after a picture', format: (v) => `${v.toFixed(2)} s`,
+      groups: [['1.7B question', 0.08, null], ['VL follow-up', 1.89, null], ['Audio, a clip', 0.34, null], ['Omni, a clip', 0.32, null]],
+    },
+    {
+      title: 'Writing', unit: 'Tokens written per second: longer is better',
+      verdict: '93 to 97 tokens a second', format: (v) => `${v.toFixed(1)}/s`,
+      groups: [['LFM3-1.7B', 97.2, null], ['LFM3-VL-2B', 93.0, null], ['LFM3-Audio-2B', 93.8, null], ['LFM3-Omni-2B', 94.5, null]],
+    },
+    {
+      title: 'Decisions', unit: 'Seconds from Send to every answer: shorter is better',
+      verdict: 'Every question of a request in one pass', format: (v) => `${v.toFixed(2)} s`,
+      groups: [['d1-2B invoice', 0.38, null], ['d1-2B receipt', 4.29, null], ['d1-Omni voice', 0.50, null]],
+    },
+    {
+      title: 'Download', unit: 'Megabytes: the bundle against the bf16 checkpoint',
+      verdict: '57 to 58% of the checkpoint', format: (v) => `${v} MB`,
+      groups: [['LFM3-1.7B', 1963, 3457], ['LFM3-VL-2B', 2181, 3836], ['LFM3-Audio-2B', 2294, 4004], ['LFM3-Omni-2B', 2512, 4333]],
+    },
+  ];
+  const grid = document.getElementById('grid');
+  const row = (value, color, scale, panel) => value === null
+    ? `<div class="row none">${panel.none}</div>`
+    : `<div class="row"><div class="bar" style="width:${(value / scale) * 100}%;background:${color}"></div>${panel.format(value)}</div>`;
+
+  for (const panel of PANELS) {
+    const scale = Math.max(...panel.groups.flatMap(([, ours, theirs]) => [ours, theirs ?? 0])) * 1.32;
+    const groups = panel.groups.map(([label, ours, theirs]) => `
+      <div class="group"><b>${label}</b><div class="bars">
+        ${row(ours, 'var(--ours)', scale, panel)}${theirs === null ? '' : row(theirs, 'var(--theirs)', scale, panel)}
+      </div></div>`).join('');
+    grid.insertAdjacentHTML('beforeend', `
+      <section class="panel">
+        <h2>${panel.title}</h2><p class="unit">${panel.unit}</p>
+        <p class="verdict${panel.loss ? ' loss' : ''}">${panel.verdict}</p>${groups}
+      </section>`);
+  }
+  if (new URLSearchParams(location.search).get('theme') === 'dark') document.documentElement.classList.add('dark');
+</script>
+</body>
+</html>

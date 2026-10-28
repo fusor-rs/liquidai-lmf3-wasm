@@ -1,0 +1,169 @@
+{
+  "ticket": {
+    "refund": {
+      "type": "noul",
+      "noul": 0.9969030402847027
+    },
+    "team": {
+      "type": "choice",
+      "choice": "billing",
+      "confidence": 0.7103009614154212,
+      "probabilities": {
+        "billing": 0.7103009614154212,
+        "shipping": 0.2444550055272696,
+        "technical": 0.045244033057309195
+      }
+    },
+    "topics": {
+      "type": "choice",
+      "choices": [
+        "billing",
+        "delivery"
+      ],
+      "probabilities": {
+        "billing": 0.9430414822961373,
+        "delivery": 0.9678896041331937,
+        "login": 0.0
+      }
+    },
+    "urgency": {
+      "type": "score",
+      "score": 1.0,
+      "confidence": 0.6731807306196588,
+      "probabilities": {
+        "0": 0.2340113052108735,
+        "1": 0.6731807306196588,
+        "2": 0.09280796416946771
+      },
+      "legend": {
+        "0": "low",
+        "1": "medium",
+        "2": "high"
+      }
+    }
+  },
+  "invoice": {
+    "payee": {
+      "type": "text",
+      "text": "ACME SA",
+      "span": [
+        0,
+        7
+      ],
+      "found": 0.9974955448379578
+    },
+    "total": {
+      "type": "number",
+      "number": 1234.5,
+      "span": [
+        36,
+        48
+      ],
+      "found": 0.9991672149708332,
+      "text": "1 234,50 EUR",
+      "unit": "EUR"
+    },
+    "due": {
+      "type": "date",
+      "date": "2026-04-03",
+      "span": [
+        60,
+        70
+      ],
+      "found": 1.0,
+      "text": "03/04/2026"
+    },
+    "vat": {
+      "type": "number",
+      "number": null,
+      "span": null,
+      "found": 0.0,
+      "text": null,
+      "unit": null
+    }
+  },
+  "receipt": {
+    "receipt": {
+      "type": "noul",
+      "noul": 0.9974745037485823
+    },
+    "kind": {
+      "type": "choice",
+      "choice": "shop",
+      "confidence": 0.9540780483362917,
+      "probabilities": {
+        "shop": 0.9540780483362917,
+        "restaurant": 0.04118235523776176,
+        "fuel": 0.00473959642594652
+      }
+    },
+    "total": {
+      "type": "box",
+      "box": {
+        "top": 0.498,
+        "bottom": 0.52,
+        "left": 0.763,
+        "right": 0.858
+      },
+      "found": 1.0,
+      "confidence": 0.866179180420157
+    },
+    "prices": {
+      "type": "boxes",
+      "boxes": [
+        {
+          "box": {
+            "top": 0.457,
+            "bottom": 0.46,
+            "left": 0.762,
+            "right": 0.857
+          },
+          "found": 0.9074940874708257,
+          "confidence": 0.0
+        },
+        {
+          "box": {
+            "top": 0.267,
+            "bottom": 0.293,
+            "left": 0.779,
+            "right": 0.857
+          },
+          "found": 1.0,
+          "confidence": 0.9696240655100822
+        },
+        {
+          "box": {
+            "top": 0.309,
+            "bottom": 0.336,
+            "left": 0.783,
+            "right": 0.858
+          },
+          "found": 0.9897529753425188,
+          "confidence": 0.9656677983016564
+        },
+        {
+          "box": {
+            "top": 0.352,
+            "bottom": 0.379,
+            "left": 0.794,
+            "right": 0.86
+          },
+          "found": 0.9586596631070897,
+          "confidence": 0.9537989966763791
+        }
+      ],
+      "count": 4,
+      "at_least": false,
+      "presence": [
+        1.0,
+        0.9897529753425188,
+        0.9586596631070897,
+        0.9074940874708257,
+        0.3501261939895962,
+        0.03570336217816428,
+        0.005481653161339519,
+        0.00014606704043404004
+      ]
+    }
+  }
+}

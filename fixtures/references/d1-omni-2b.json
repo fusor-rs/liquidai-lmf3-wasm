@@ -1,0 +1,152 @@
+{
+  "ticket": {
+    "refund": {
+      "type": "noul",
+      "noul": 0.9424776348176721
+    },
+    "team": {
+      "type": "choice",
+      "choice": "billing",
+      "confidence": 0.5049954808291338,
+      "probabilities": {
+        "billing": 0.5049954808291338,
+        "shipping": 0.47786136854990074,
+        "technical": 0.017143150620965393
+      }
+    },
+    "topics": {
+      "type": "choice",
+      "choices": [
+        "billing",
+        "delivery"
+      ],
+      "probabilities": {
+        "billing": 0.8708975767245068,
+        "delivery": 0.8918918918918919,
+        "login": 9.289719306637828e-06
+      }
+    },
+    "urgency": {
+      "type": "score",
+      "score": 1.0,
+      "confidence": 0.6248605503508943,
+      "probabilities": {
+        "0": 0.0702630937963134,
+        "1": 0.6248605503508943,
+        "2": 0.3048763558527922
+      },
+      "legend": {
+        "0": "low",
+        "1": "medium",
+        "2": "high"
+      }
+    }
+  },
+  "receipt": {
+    "receipt": {
+      "type": "noul",
+      "noul": 0.9403618217204095
+    },
+    "kind": {
+      "type": "choice",
+      "choice": "shop",
+      "confidence": 0.9563463272208769,
+      "probabilities": {
+        "shop": 0.9563463272208769,
+        "restaurant": 0.03540167245886668,
+        "fuel": 0.008252000320256511
+      }
+    },
+    "total": {
+      "type": "box",
+      "box": {
+        "top": 0.494,
+        "bottom": 0.519,
+        "left": 0.758,
+        "right": 0.863
+      },
+      "found": 0.9984583810753025,
+      "confidence": 0.936923076923077
+    },
+    "prices": {
+      "type": "boxes",
+      "boxes": [
+        {
+          "box": {
+            "top": 0.41300000000000003,
+            "bottom": 0.495,
+            "left": 0.77,
+            "right": 0.861
+          },
+          "found": 0.5893334523941053,
+          "confidence": 0.5907602764641688
+        },
+        {
+          "box": {
+            "top": 0.309,
+            "bottom": 0.337,
+            "left": 0.779,
+            "right": 0.863
+          },
+          "found": 0.993096783572218,
+          "confidence": 0.9401709401709402
+        },
+        {
+          "box": {
+            "top": 0.265,
+            "bottom": 0.293,
+            "left": 0.786,
+            "right": 0.865
+          },
+          "found": 1.0,
+          "confidence": 0.9401709401709402
+        },
+        {
+          "box": {
+            "top": 0.35100000000000003,
+            "bottom": 0.378,
+            "left": 0.788,
+            "right": 0.864
+          },
+          "found": 0.9568289504208982,
+          "confidence": 0.9401709401709402
+        }
+      ],
+      "count": 4,
+      "at_least": false,
+      "presence": [
+        1.0,
+        0.993096783572218,
+        0.9568289504208982,
+        0.5893334523941053,
+        0.2885326919602841,
+        0.04769875429560208,
+        0.004103923979238449,
+        0.0012203863012701889
+      ]
+    }
+  },
+  "voice": {
+    "speaker": {
+      "type": "choice",
+      "choice": "woman",
+      "confidence": 0.8567999966514281,
+      "probabilities": {
+        "woman": 0.8567999966514281,
+        "man": 0.12982683555483776,
+        "child": 0.01337316779373409
+      }
+    },
+    "language": {
+      "type": "choice",
+      "choice": "English",
+      "confidence": 0.9437296891069206,
+      "probabilities": {
+        "English": 0.9437296891069206,
+        "French": 0.020481099128294582,
+        "German": 0.01817185483246821,
+        "Spanish": 0.017617356932316516
+      }
+    }
+  }
+}

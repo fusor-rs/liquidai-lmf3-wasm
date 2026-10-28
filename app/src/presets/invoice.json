@@ -1,0 +1,6 @@
+{
+  "payee": { "type": "text", "instructions": "Who issued the invoice?" },
+  "total": { "type": "number", "instructions": "How much is due?", "unit": "EUR" },
+  "due": { "type": "date", "instructions": "By when must it be paid?" },
+  "vat": { "type": "number", "instructions": "How much VAT is charged?" }
+}
